@@ -1,127 +1,88 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <title>立秋奇迹 · 只为你展开</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <!-- 艺术字体和图标 -->
-  <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?display=swap&family=Noto+Serif+SC:wght@700&family=Quicksand:wght@400;700&family=ZCOOL+KuaiLe&family=Pacifico" rel="stylesheet">
-  <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>一份慢慢展开的秋日画卷</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-<div id="curtain">
-  <button id="start-button">
-    <span>— 开启秋日专属 —</span>
-    <span class="start-flare"></span>
-  </button>
-</div>
 
-<main id="storybook" class="hidden">
-  <!-- 背景分层 -->
-  <div id="background-3d">
-    <canvas id="bg-canvas"></canvas>
-    <div id="ambient-glow"></div>
-    <div id="bg-overlay"></div>
-  </div>
-  <!-- 落叶Canvas（更灵动） -->
-  <canvas id="leaves-canvas"></canvas>
+    <main class="storybook-container">
+        <!-- 初始引导 -->
+        <section class="scene scene-intro">
+            <h1>给鑫楠的秋日画卷</h1>
+            <p>请向下滑动，慢慢展开...</p>
+            <div class="scroll-down-arrow"></div>
+        </section>
 
-  <!-- 场景1：引入 -->
-  <section class="scene scene-intro">
-    <div class="intro-content">
-      <h1 class="fade-in">秋日画卷 · 独宠鑫楠</h1>
-      <div class="subline fade-in">— 这个秋天的每一丝温暖，都只属于你 —</div>
-      <div class="scroll-indicator">
-        <div class="arrow"></div>
-      </div>
-    </div>
-  </section>
+        <!-- 场景：家的角落 (结构重组) -->
+        <section class="scene scene-room">
+            <!-- 房间背景层 -->
+            <div class="room-bg"></div>
 
-  <!-- 场景2：猫咪互动 -->
-  <section class="scene scene-main">
-    <div class="composition">
-      <div class="l-pane">
-        <div class="cat interactive" id="cat1" title="轻轻撸我">
-          <!-- 另一只猫SVG，带可切换表情 -->
-          <svg id="cat1-svg" viewBox="0 0 120 100">
-            <ellipse class="body" cx="65" cy="70" rx="45" ry="25" fill="#c7aea8" />
-            <ellipse class="shadow" cx="65" cy="97" rx="24" ry="5" fill="rgba(0,0,0,0.15)" />
-            <g class="head-group">
-              <ellipse class="head" cx="45" cy="40" rx="28" ry="25" fill="#c7aea8"/>
-              <ellipse class="ear left" cx="23" cy="16" rx="9" ry="15" fill="#b09491"/>
-              <ellipse class="ear right" cx="67" cy="16" rx="9" ry="15" fill="#b09491"/>
-              <ellipse class="eye left" cx="35" cy="40" rx="4" ry="6" fill="#222"/>
-              <ellipse class="eye right" cx="55" cy="40" rx="4" ry="6" fill="#222"/>
-              <ellipse class="face-blush left" cx="30" cy="50" rx="2.6" ry="1" fill="#ffd4d3" />
-              <ellipse class="face-blush right" cx="60" cy="50" rx="2.6" ry="1" fill="#ffd4d3" />
-              <path class="smile" d="M38,54 Q45,58,52,54" stroke="#8d6054" stroke-width="2" fill="none"/>
-              <g class="purr-bubble hidden"></g>
-            </g>
-          </svg>
-          <audio id="purr-sound" src="purr.mp3" preload="auto"></audio>
-        </div>
-      </div>
-      <div class="c-pane">
-        <div class="blessing-text">
-          <p class="fade-in">
-            你和咕噜，是我的整个秋天。<br>
-            愿每一片叶子都承载我的思念，与你温柔拥抱。
-          </p>
-        </div>
-      </div>
-      <div class="r-pane">
-        <div class="cat gulu interactive" id="gulu-cat" title="点我有奇迹">
-          <!-- 咕噜猫：头部独立、耳朵转动、眼珠跟随 -->
-          <svg id="gulu-svg" viewBox="0 0 120 100">
-            <defs>
-              <radialGradient id="catFur" cx="0.6" cy="0.4" r="0.9">
-                  <stop offset="40%" stop-color="#f2e7da"/>
-                  <stop offset="80%" stop-color="#cbc0b1"/>
-                  <stop offset="100%" stop-color="#bfae95"/>
-              </radialGradient>
-            </defs>
-            <ellipse class="body-g" cx="65" cy="78" rx="39" ry="19" fill="url(#catFur)" style="filter: blur(0.3px);"/>
-            <ellipse class="shadow" cx="65" cy="97" rx="22" ry="6" fill="rgba(0,0,0,0.11)" />
-            <g class="gulu-head-group">
-                <g class="ear-g l"><ellipse cx="32" cy="24" rx="11" ry="16" fill="#bda18f"/></g>
-                <g class="ear-g r"><ellipse cx="68" cy="24" rx="11" ry="16" fill="#bda18f"/></g>
-                <ellipse class="face-g" cx="50" cy="40" rx="25" ry="22" fill="url(#catFur)"/>
-                <ellipse class="eye-g l" cx="40" cy="43" rx="5" ry="7" fill="#222"/>
-                <ellipse class="eye-g r" cx="60" cy="43" rx="5" ry="7" fill="#222"/>
-                <ellipse class="eye-gball l" cx="41" cy="45" rx="1.6" ry="2.6" fill="#fff"/>
-                <ellipse class="eye-gball r" cx="61" cy="45" rx="1.6" ry="2.6" fill="#fff"/>
-                <ellipse class="blush l" cx="37" cy="53" rx="2.4" ry="1.3" fill="#ffc9b6"/>
-                <ellipse class="blush r" cx="63" cy="53" rx="2.4" ry="1.3" fill="#ffc9b6"/>
-                <path class="gulu-mouth" d="M47,56 Q50,59 53,56" stroke="#e39c7b" stroke-width="2" fill="none"/>
-                <g class="whiskers-g">
-                  <path d="M27,50 Q19,51 23,54" stroke="#c3a891" stroke-width="1" fill="none"/>
-                  <path d="M73,50 Q81,51 77,54" stroke="#c3a891" stroke-width="1" fill="none"/>
-                </g>
-            </g>
-          </svg>
-          <canvas class="love-canvas"></canvas>
-        </div>
-      </div>
-    </div>
-  </section>
+            <!-- 窗户 (所有窗外景物都在里面) -->
+            <div class="window-container" data-speed="0.3">
+                <div class="window-pane">
+                    <div class="distant-hills"></div>
+                    <div class="leaves-container"></div>
+                </div>
+            </div>
 
-  <!-- 场景3：信与签名 -->
-  <section class="scene scene-letter">
-    <div class="letter-card fade-in">
-      <h2>来自咕噜和我的秋日誓言</h2>
-      <p>
-        不论秋叶何时落尽，温暖与陪伴都不会消散。<br>
-        你在时，秋天不会冷；我和咕噜就在你身边，静静守候。
-      </p>
-      <div class="signature">
-        <p>献上全部爱意：<br>曾建勤 & 咕噜</p>
-      </div>
-    </div>
-  </section>
-</main>
-<audio id="bgm" src="bgm.mp3" loop></audio>
-<div id="music-toggle" class="hidden"><span class="note">&#9835;</span></div>
+            <!-- 前景内容 -->
+            <div class="foreground-content">
+                <div class="text-block" data-speed="0.6">
+                    <p class="fade-in">秋天，<br>是思念开始变得温热的季节。</p>
+                    <p class="fade-in">我想为你创造一个温暖的小世界，<br>就像这幅画卷一样...</p>
+                </div>
+
+                <div class="cat-group" data-speed="0.8">
+                    <div class="cat" id="cat1" title="可以“撸”一下这只猫哦">
+                        <svg viewBox="0 0 100 100"><path d="M 50,95 C 20,95 20,60 50,60 S 80,95 50,95 Z" fill="#b0a59a"/><circle cx="50" cy="45" r="20" fill="#b0a59a"/><path d="M 35,30 Q 30,15 45,25" fill="#b0a59a"/><path d="M 65,30 Q 70,15 55,25" fill="#b0a59a"/><path d="M 42,45 C 45,48 48,45 42,45" stroke="black" stroke-width="1.5" fill="none" class="eye"/><path d="M 58,45 C 55,48 52,45 58,45" stroke="black" stroke-width="1.5" fill="none" class="eye"/></svg>
+                    </div>
+                    <div class="cat" id="gulu-cat" title="咕噜在看着你呢">
+                        <svg viewBox="0 0 100 100">
+                            <g class="gulu-body">
+                                <path d="M 20,80 C 10,60 30,50 50,55 C 80,60 90,80 80,80 Z" fill="#d4c8be"/>
+                                <path d="M 20,75 Q 5,70 15,60" stroke="#d4c8be" stroke-width="5" fill="none" class="tail"/>
+                            </g>
+                            <g class="gulu-head">
+                                <circle cx="70" cy="45" r="15" fill="#d4c8be"/>
+                                <path d="M 60,35 Q 55,25 65,32" fill="#d4c8be"/>
+                                <path d="M 80,35 Q 85,25 75,32" fill="#d4c8be"/>
+                                <path d="M 65,45 C 67,47 69,45 65,45" stroke="black" stroke-width="1" fill="none" class="eye"/>
+                                <path d="M 75,45 C 73,47 71,45 75,45" stroke="black" stroke-width="1" fill="none" class="eye"/>
+                                <path d="M 60,58 A 15 15 0 0 1 80 58" stroke="#e58a70" stroke-width="2.5" fill="none"/>
+                            </g>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- 隐藏彩蛋 -->
+                <div id="hidden-mouse" title="嘿！"></div>
+            </div>
+        </section>
+
+        <!-- 场景：最终的约定 -->
+        <section class="scene scene-letter">
+            <div class="letter-card fade-in">
+                <h2>我们的秋日约定</h2>
+                <p>我希望你知道，无论何时，<br>这个温暖的角落永远为你敞开。</p>
+                <p>请一定每天都开开心心的，<br>好好照顾自己。</p>
+                <p>而我和咕噜，会一直在这里，<br>用我们全部的爱意和呼噜声，<br>永远陪着你。</p>
+                <div class="signature">
+                    <p>爱你的：曾建勤<br>& 你的咕噜</p>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <audio id="bgm" src="bgm.mp3" loop></audio>
+    <div id="music-toggle">♫</div>
+
 </body>
 <script src="script.js"></script>
 </html>
