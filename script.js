@@ -1,66 +1,78 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- 元素获取 ---
-    const diorama = document.querySelector('.diorama-box');
-    const guluCat = document.getElementById('gulu-cat');
-    const letterLayer = document.querySelector('.layer-letter');
-    const initialPrompt = document.querySelector('.prompt-initial');
-    const leavesContainer = document.querySelector('.layer-leaves');
+    const parallaxBG = document.querySelector('.parallax-bg');
+    const parallaxFG = document.querySelector('.parallax-fg');
+    const cats = document.querySelectorAll('.cat');
+    const tooltip = document.getElementById('cat-tooltip');
     const bgm = document.getElementById('bgm');
     const musicToggle = document.getElementById('music-toggle');
+    const fadeInElements = document.querySelectorAll('.fade-in');
 
-    let isInitialized = false;
-
-    // --- 3D 交互逻辑 ---
-    function handleMove(x, y) {
-        if (!isInitialized) return;
-        const { clientWidth, clientHeight } = document.documentElement;
-        const rotY = 15 * ((x - clientWidth / 2) / (clientWidth / 2));
-        const rotX = -15 * ((y - clientHeight / 2) / (clientHeight / 2));
-        diorama.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
-    }
-
-    // --- 初始点击事件 ---
-    function initialize() {
-        if (isInitialized) return;
-        isInitialized = true;
-
-        initialPrompt.style.display = 'none';
-        diorama.style.transition = 'transform 0.1s ease-out';
-        diorama.classList.add('initialized'); // 激活流光边框
-
-        document.addEventListener('mousemove', e => handleMove(e.clientX, e.clientY));
-
-        if (window.DeviceOrientationEvent) {
-            // 请求陀螺仪权限 (兼容iOS 13+)
-            if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-                DeviceOrientationEvent.requestPermission()
-                    .then(permissionState => {
-                        if (permissionState === 'granted') {
-                            window.addEventListener('deviceorientation', handleOrientation);
-                        }
-                    }).catch(console.error);
-            } else {
-                window.addEventListener('deviceorientation', handleOrientation);
-            }
+    // --- 视差滚动逻辑 ---
+    window.addEventListener('scroll', () => {
+        const scrollY = window.scrollY;
+        // 移动背景和前景
+        if (parallaxBG) {
+            const bgSpeed = parallaxBG.dataset.speed;
+            parallaxBG.style.transform = `translateY(${scrollY * bgSpeed}px)`;
         }
-
-        bgm.play().catch(() => { });
-        musicToggle.classList.add('visible', 'playing');
-    }
-
-    function handleOrientation(e) {
-        const rotY = e.gamma * 0.5; // Left-to-right tilt
-        const rotX = (e.beta - 45) * 0.5; // Front-to-back tilt
-        diorama.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
-    }
-
-    document.body.addEventListener('click', initialize, { once: true });
-
-    // --- 咕噜点击事件 ---
-    guluCat.addEventListener('click', (e) => {
-        if (!isInitialized) return;
-        e.stopPropagation();
-        letterLayer.classList.toggle('visible');
+        if (parallaxFG) {
+            const fgSpeed = parallaxFG.dataset.speed;
+            parallaxFG.style.transform = `translateY(${scrollY * fgSpeed}px)`;
+        }
+        
+        // 第一次滚动时播放音乐
+        if (bgm.paused && bgm.currentTime === 0) {
+            bgm.play().catch(()=>{});
+            musicToggle.classList.add('playing');
+        }
     });
 
-// ---
+    // --- Intersection Observer 逻辑 (元素进入视野时添加动画类) ---
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+            }
+        });
+    }, {
+        threshold: 0.1 // 元素进入10%时触发
+    });
+    fadeInElements.forEach(el => observer.observe(el));
+    
+    // --- 猫咪交互 ---
+    cats.forEach(cat => {
+        cat.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const message = cat.dataset.message;
+            const rect = cat.getBoundingClientRect();
+
+            tooltip.textContent = message;
+            tooltip.style.left = `${rect.left + rect.width / 2 - tooltip.offsetWidth / 2}px`;
+            tooltip.style.top = `${rect.top - tooltip.offsetHeight - 10}px`;
+            tooltip.classList.remove('hidden');
+
+            setTimeout(() => tooltip.classList.add('hidden'), 3000);
+        });
+    });
+
+    // --- 音乐控制 ---
+    musicToggle.addEventListener('click', () => {
+        if (bgm.paused) { bgm.play(); musicToggle.classList.add('playing'); } 
+        else { bgm.pause(); musicToggle.classList.remove('playing'); }
+    });
+
+    // --- 生成落叶 ---
+    const leavesContainer = document.querySelector('.leaves-container');
+    if(leavesContainer) {
+        for (let i = 0; i < 20; i++) {
+            const leaf = document.createElement('div');
+            leaf.className = 'leaf';
+            leaf.style.left = `${Math.random() * 100}%`;
+            leaf.style.animationDelay = `${Math.random() * 10}s`;
+            const size = 1.5 + Math.random() * 1.5;
+            leaf.style.width = `${size}vmin`; leaf.style.height = `${size}vmin`;
+            leavesContainer.appendChild(leaf);
+        }
+    }
+});
