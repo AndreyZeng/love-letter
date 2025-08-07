@@ -1,17 +1,16 @@
 :root {
-    --bg-color: #3d3532; /* 秋夜棕黑色 */
+    --bg-color: #1a1a2e; /* 深邃夜空色 */
     --accent-color: #e58a70;
-    --sky-top: #4a3c35; /* 秋夜天空顶部 */
-    --sky-bottom: #2b2320; /* 秋夜天空底部 */
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { background-color: var(--bg-color); font-family: 'Noto Serif SC', serif; overflow: hidden; height: 100vh; width: 100vw; }
 .hidden { display: none !important; }
 
-/* --- 开幕遮罩 (保持不变) --- */
-#curtain { /* ... */ }
-#start-button { /* ... */ }
-@keyframes pulse { /* ... */ }
+/* --- 开幕遮罩 --- */
+#curtain { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #000; display: flex; justify-content: center; align-items: center; z-index: 1000; transition: opacity 1.5s ease-out; }
+#start-button { background: none; border: 2px solid rgba(255,255,255,0.5); color: rgba(255,255,255,0.8); font-family: var(--font-serif); font-size: 4vmin; padding: 2vmin 4vmin; border-radius: 50px; cursor: pointer; text-shadow: 0 0 10px rgba(255,255,255,0.5); box-shadow: 0 0 20px rgba(255,255,255,0.2); animation: pulse 2.5s infinite; transition: background 0.3s, color 0.3s; }
+#start-button:hover { background: rgba(255,255,255,0.1); color: #fff; }
+@keyframes pulse { 50% { transform: scale(1.05); box-shadow: 0 0 30px rgba(255,255,255,0.4); } }
 
 /* --- 3D 景箱 --- */
 .diorama-container { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; perspective: 1200px; opacity: 0; transition: opacity 1s; }
@@ -27,10 +26,9 @@ body { background-color: var(--bg-color); font-family: 'Noto Serif SC', serif; o
 .layer-wish  { transform: translateZ(-20px); align-items: flex-end; padding-bottom: 35%; text-align: center; }
 .layer-cat-1 { transform: translateZ(0px); align-items: flex-end; justify-content: flex-start; }
 .layer-gulu  { transform: translateZ(40px); align-items: flex-end; }
-.layer-foreground-leaves { transform: translateZ(100px); pointer-events: none; } /* 最前景 */
 
 /* --- 背景内容 --- */
-#starry-sky { width: 100%; height: 100%; background: radial-gradient(ellipse at bottom, var(--sky-bottom) 0%, var(--sky-top) 100%); animation: moveBg 50s linear infinite; }
+#starry-sky { width: 100%; height: 100%; background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%); animation: moveBg 50s linear infinite; }
 @keyframes moveBg { from { background-position: 0 0; } to { background-position: -10000px 5000px; } }
 .star { position: absolute; background: #fff; border-radius: 50%; box-shadow: 0 0 5px #fff; animation: twinkle linear infinite; }
 @keyframes twinkle { 50% { opacity: 0.3; transform: scale(0.8); } }
@@ -38,18 +36,20 @@ body { background-color: var(--bg-color); font-family: 'Noto Serif SC', serif; o
 @keyframes shoot { 0% { transform: translateX(50vw) translateY(-50vh) rotate(135deg); opacity: 0; } 90% { opacity: 0; } 91% { opacity: 1; } 95% { transform: translateX(-50vw) translateY(50vh) rotate(135deg); opacity: 0; } 100% { opacity: 0; } }
 
 /* --- 前景内容 --- */
-.leaf { position: absolute; background-color: var(--accent-color); border-radius: 0 50% 0 50%; opacity: 0.7; animation: fall linear infinite; }
-@keyframes fall { from { transform: translateY(-10vh) rotate(0deg); } to { transform: translateY(110vh) rotate(720deg); } }
 .cat { width: 20vmin; cursor: pointer; transition: transform 0.3s; position: relative; }
-#cat1 { animation: purr-idle 2s ease-in-out infinite; } /* 增加一个待机动画 */
-#cat1.purring { animation: purr-active 0.8s ease-in-out; }
-@keyframes purr-idle { 50% { transform: translateY(-3px); } }
-@keyframes purr-active { 0%, 100% { transform: translateY(0); } 25% { transform: translateY(-5px); } 75% { transform: translateY(2px); } }
+#cat1:hover { animation: purr 0.8s ease-in-out infinite; }
+@keyframes purr { 50% { transform: translateY(-3px); } }
 #gulu-cat { width: 25vmin; }
 #gulu-cat:hover { transform: scale(1.05); }
-.letter-content, #wish-text { /* ... 继承旧样式 ... */ }
-#cat-tooltip { position: fixed; background: rgba(0,0,0,0.7); color: white; padding: 10px 15px; border-radius: 8px; font-size: 0.9rem; pointer-events: none; z-index: 1000; transition: opacity 0.3s; }
+.letter-content { color: #f0e6e0; padding: 4vmin; width: 90%; text-align: center; text-shadow: 0 1px 5px #000; }
+.letter-content h2, .letter-content p { font-size: 2.5vmin; line-height: 1.6; }
+#wish-text { font-size: 3vmin; line-height: 1.8; color: #fff; text-shadow: 0 0 15px rgba(229, 138, 112, 0.8); min-height: 6vmin; } /* 增加最小高度防止抖动 */
+#wish-text::after { content: '|'; animation: blink 1s step-end infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+.hover-heart { position: absolute; color: rgba(229, 138, 112, 0.7); font-size: 2vmin; animation: floatUp 2s ease-out forwards; pointer-events: none; }
+@keyframes floatUp { to { transform: translateY(-50px); opacity: 0; } }
 
-/* ... (继承信封、提示、音乐等旧样式) ... */
-#curtain, #start-button, @keyframes pulse, .diorama-container, .diorama-box, .diorama-box::before, @keyframes animateBorder, .layer-letter, .layer-wish, .letter-content, #wish-text, #wish-text::after, @keyframes blink, #music-toggle { /* ... */ }
-#curtain { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; cursor: pointer; transition: opacity 1s 1s; } .envelope-wrapper { perspective: 1000px; } .envelope { position: relative; width: 60vmin; max-width: 300px; height: 40vmin; max-height: 200px; background-color: #f0e6e0; box-shadow: 0 10px 30px rgba(0,0,0,0.3); } .flap { position: absolute; background-color: #f0e6e0; border: 1px solid #dcd3c9; } .flap.top { width: 100%; height: 55%; top: 0; transform-origin: top; border-bottom: none; z-index: 3; transition: transform 0.5s ease-in-out; } .flap.left, .flap.right { width: 55%; height: 100%; top: 0; z-index: 2; transition: transform 0.7s 0.3s ease-in-out; } .flap.left { left: 0; } .flap.right { right: 0; } .seal { position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); width: 8vmin; height: 8vmin; max-width: 40px; max-height: 40px; background-color: var(--accent-color); color: #fff; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 5vmin; z-index: 4; transition: opacity 0.3s; } .prompt { color: rgba(255,255,255,0.7); margin-top: 30px; font-size: 3vmin; animation: pulse 2.5s infinite; } #curtain.opened .seal { opacity: 0; } #curtain.opened .flap.top { transform: rotateX(180deg); } #curtain.opened .flap.left { transform: translateX(-100%) rotateY(90deg); } #curtain.opened .flap.right { transform: translateX(100%) rotateY(-90deg); } #wish-text { font-size: 3vmin; line-height: 1.8; color: #fff; text-shadow: 0 0 15px rgba(229, 138, 112, 0.8); } #wish-text::after { content: '|'; animation: blink 1s step-end infinite; } @keyframes blink { 50% { opacity: 0; } } .letter-content { color: #f0e6e0; padding: 4vmin; width: 90%; text-align: center; text-shadow: 0 1px 5px #000; } .letter-content h2, .letter-content p { font-size: 2.5vmin; line-height: 1.6; } #music-toggle { position: fixed; bottom: 20px; right: 20px; width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; color: #fff; z-index: 200; opacity: 0; transition: opacity 1s; } #music-toggle.visible { opacity: 1; } #music-toggle.playing { color: var(--accent-color); }
+/* --- 音乐开关 --- */
+#music-toggle { position: fixed; bottom: 20px; right: 20px; width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; color: #fff; z-index: 200; opacity: 0; transition: opacity 1s; }
+#music-toggle.visible { opacity: 1; }
+#music-toggle.playing { color: var(--accent-color); }
