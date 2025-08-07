@@ -1,60 +1,66 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- 元素获取 ---
-    const elementsToParallax = document.querySelectorAll('[data-speed]');
-    const fadeInElements = document.querySelectorAll('.fade-in');
-    const guluHead = document.querySelector('.gulu-head');
+    const diorama = document.querySelector('.diorama-box');
+    const guluCat = document.getElementById('gulu-cat');
+    const letterLayer = document.querySelector('.layer-letter');
+    const initialPrompt = document.querySelector('.prompt-initial');
+    const leavesContainer = document.querySelector('.layer-leaves');
     const bgm = document.getElementById('bgm');
     const musicToggle = document.getElementById('music-toggle');
-    const hiddenMouse = document.getElementById('hidden-mouse');
+    
+    let isInitialized = false;
 
-    // --- 核心滚动逻辑 ---
-    window.addEventListener('scroll', () => {
-        const scrollY = window.scrollY;
-        // 1. 视差效果
-        elementsToParallax.forEach(el => {
-            const speed = el.dataset.speed;
-            el.style.transform = `translateY(${scrollY * speed}px)`;
-        });
-        // 2. 首次滚动播放音乐
-        if (bgm.paused && bgm.currentTime === 0) {
-            bgm.play().catch(()=>{});
-            musicToggle.classList.add('playing');
-        }
-    });
+    // --- 3D 交互逻辑 ---
+    function handleMove(x, y) {
+        if (!isInitialized) return;
+        const { clientWidth, clientHeight } = document.documentElement;
+        const rotY = 15 * ((x - clientWidth / 2) / (clientWidth / 2));
+        const rotX = -15 * ((y - clientHeight / 2) / (clientHeight / 2));
+        diorama.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+    }
 
-    // --- 元素进入视野动画 ---
-    const observer = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('is-visible');
+    // --- 初始点击事件 ---
+    function initialize() {
+        if (isInitialized) return;
+        isInitialized = true;
+        
+        initialPrompt.style.display = 'none';
+        diorama.style.transition = 'transform 0.1s ease-out';
+        diorama.classList.add('initialized'); // 激活流光边框
+        
+        document.addEventListener('mousemove', e => handleMove(e.clientX, e.clientY));
+        
+        if (window.DeviceOrientationEvent) {
+            // 请求陀螺仪权限 (兼容iOS 13+)
+            if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+                DeviceOrientationEvent.requestPermission()
+                .then(permissionState => {
+                    if (permissionState === 'granted') {
+                        window.addEventListener('deviceorientation', handleOrientation);
+                    }
+                }).catch(console.error);
+            } else {
+                window.addEventListener('deviceorientation', handleOrientation);
             }
-        });
-    }, { threshold: 0.2 });
-    fadeInElements.forEach(el => observer.observe(el));
+        }
+        
+        bgm.play().catch(() => {});
+        musicToggle.classList.add('visible', 'playing');
+    }
 
-    // --- “咕噜”跟随鼠标 ---
-    document.addEventListener('mousemove', (e) => {
-        if (!guluHead) return;
-        const headRect = guluHead.getBoundingClientRect();
-        const headCenterX = headRect.left + headRect.width / 2;
-        const headCenterY = headRect.top + headRect.height / 2;
-        
-        const angle = Math.atan2(e.clientY - headCenterY, e.clientX - headCenterX);
-        const degrees = angle * (180 / Math.PI);
-        
-        // 限制旋转角度，让它更自然
-        const clampedDegrees = Math.max(-20, Math.min(20, degrees));
-        
-        guluHead.style.transform = `rotate(${clampedDegrees}deg)`;
-    });
+    function handleOrientation(e) {
+        const rotY = e.gamma * 0.5; // Left-to-right tilt
+        const rotX = (e.beta - 45) * 0.5; // Front-to-back tilt
+        diorama.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+    }
+    
+    document.body.addEventListener('click', initialize, { once: true });
 
-    // --- 隐藏彩蛋交互 ---
-    hiddenMouse.addEventListener('click', () => {
-        hiddenMouse.style.transition = 'transform 0.5s';
-        hiddenMouse.style.transform = 'translateY(20px)';
-        setTimeout(() => {
-            hiddenMouse.style.transform = 'translateY(0)';
-        }, 500);
+    // --- 咕噜点击事件 ---
+    guluCat.addEventListener('click', (e) => {
+        if (!isInitialized) return;
+        e.stopPropagation();
+        letterLayer.classList.toggle('visible');
     });
 
     // --- 音乐控制 ---
@@ -64,16 +70,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- 生成落叶 ---
-    const leavesContainer = document.querySelector('.leaves-container');
-    if (leavesContainer) {
-        for (let i = 0; i < 15; i++) {
-            const leaf = document.createElement('div');
-            leaf.className = 'leaf';
-            leaf.style.left = `${Math.random() * 100}%`;
-            leaf.style.animationDelay = `${Math.random() * 10}s`;
-            const size = 1.5 + Math.random() * 1.5;
-            leaf.style.width = `${size}vmin`; leaf.style.height = `${size}vmin`;
-            leavesContainer.appendChild(leaf);
-        }
+    for (let i = 0; i < 20; i++) {
+        const leaf = document.createElement('div');
+        leaf.className = 'leaf';
+        leaf.style.left = `${Math.random() * 100}%`;
+        leaf.style.top = `${Math.random() * 100}%`;
+        const duration = 5 + Math.random() * 5;
+        leaf.style.animationDuration = `${duration}s`;
+        leaf.style.animationDelay = `${Math.random() * duration}s`;
+        leavesContainer.appendChild(leaf);
     }
 });
