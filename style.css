@@ -1,90 +1,70 @@
 :root {
-    --bg-color: #3e322c;
-    --text-color: #f3eada;
+    --text-color: #fff;
     --accent-color: #e58a70;
     --font-serif: 'Noto Serif SC', serif;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html { scroll-behavior: smooth; }
-body {
-    background-color: var(--bg-color);
-    color: var(--text-color);
-    font-family: var(--font-serif);
-    overflow: hidden; /* 初始隐藏滚动条 */
-}
+body { background-color: #2b2320; color: var(--text-color); font-family: var(--font-serif); overflow: hidden; }
 .hidden { display: none !important; }
 
 /* --- 开幕遮罩 --- */
-#curtain {
-    position: fixed; top: 0; left: 0;
-    width: 100vw; height: 100vh;
-    background-color: #000;
-    display: flex; justify-content: center; align-items: center;
-    z-index: 1000;
-    transition: opacity 1.5s ease-out;
-}
-#start-button {
-    background: none; border: 2px solid rgba(255,255,255,0.5);
-    color: rgba(255,255,255,0.8); font-family: var(--font-serif);
-    font-size: 4vmin; padding: 2vmin 4vmin;
-    border-radius: 50px; cursor: pointer;
-    text-shadow: 0 0 10px rgba(255,255,255,0.5);
-    box-shadow: 0 0 20px rgba(255,255,255,0.2);
-    animation: pulse 2.5s infinite;
-    transition: background 0.3s, color 0.3s;
-}
+#curtain { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #000; display: flex; justify-content: center; align-items: center; z-index: 1000; transition: opacity 1.5s ease-out; }
+#start-button { background: none; border: 2px solid rgba(255,255,255,0.5); color: rgba(255,255,255,0.8); font-family: var(--font-serif); font-size: 4vmin; padding: 2vmin 4vmin; border-radius: 50px; cursor: pointer; text-shadow: 0 0 10px rgba(255,255,255,0.5); box-shadow: 0 0 20px rgba(255,255,255,0.2); animation: pulse 2.5s infinite; transition: background 0.3s, color 0.3s; }
 #start-button:hover { background: rgba(255,255,255,0.1); color: #fff; }
 @keyframes pulse { 50% { transform: scale(1.05); box-shadow: 0 0 30px rgba(255,255,255,0.4); } }
 
-/* --- 故事书容器 --- */
-#storybook {
-    width: 100vw; height: 100vh;
-    overflow-y: scroll;
-    scroll-snap-type: y mandatory; /* 核心：卡片式滚动 */
-    opacity: 0; filter: blur(10px);
-    transition: opacity 1s 0.5s, filter 1s 0.5s;
-}
+/* --- 故事书容器与背景 --- */
+#storybook { width: 100vw; height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; opacity: 0; filter: blur(10px); transition: opacity 1s 0.5s, filter 1s 0.5s; }
 #storybook.visible { opacity: 1; filter: blur(0px); }
-
-.scene {
-    width: 100%; height: 100vh;
-    scroll-snap-align: start; /* 每一屏都对齐 */
-    position: relative;
-    display: flex; justify-content: center; align-items: center;
+#storybook-bg {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2;
+    background-image: url(https://images.pexels.com/photos/1743165/pexels-photo-1743165.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2); /* 高质量背景图 */
+    background-size: cover; background-position: center;
+    animation: kenBurns 30s infinite;
 }
+@keyframes kenBurns { 0%, 100% { transform: scale(1) rotate(0.1deg); } 50% { transform: scale(1.1) rotate(-0.1deg); } }
+.leaves-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+.leaf { position: absolute; background-color: var(--accent-color); border-radius: 0 50% 0 50%; animation: fall linear infinite; }
+@keyframes fall { from { transform: translateY(-10vh) rotate(0deg); opacity: 0; } 20% { opacity: 0.8; } 90% { opacity: 0.8; } to { transform: translateY(110vh) rotate(720deg); opacity: 0; } }
 
-/* --- 场景1: 房间 --- */
-.composition { position: relative; width: 100%; height: 100%; }
-.window {
-    position: absolute; top: 50%; left: 25%;
-    transform: translate(-50%, -50%);
-    width: 40vmin; height: 70vmin;
-    background-color: #2c2521; border: 1.5vmin solid #fff;
-    border-radius: 1vmin; box-shadow: 0 15px 40px rgba(0,0,0,0.4);
-    overflow: hidden;
-}
-.distant-hills { position: absolute; bottom: 0; width: 150%; height: 40%; background: #382e28; border-radius: 50% 50% 0 0; }
-.leaves-container { position: absolute; width: 100%; height: 100%; }
-.leaf { position: absolute; width: 3vmin; height: 3vmin; background-color: var(--accent-color); border-radius: 0 50% 0 50%; opacity: 0.8; animation: fall 10s linear infinite; }
-@keyframes fall { from { transform: translateY(-10%); } to { transform: translateY(110%) rotate(360deg); } }
+/* --- 场景通用 --- */
+.scene { width: 100%; height: 100vh; scroll-snap-align: start; position: relative; display: flex; justify-content: center; align-items: center; }
+.scene::before { content: ''; position: absolute; width: 100%; height: 100%; background: radial-gradient(circle, transparent, rgba(43,35,32,0.8)); } /* 暗角 */
 
-.text-block { position: absolute; top: 25%; left: 55%; width: 40%; }
-.text-block p { font-size: calc(1rem + 1.5vmin); line-height: 1.8; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
-.cat { position: absolute; cursor: pointer; transition: transform 0.3s; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3)); }
-#cat1 { bottom: 20%; left: 45%; width: 22vmin; }
-#gulu-cat { bottom: 15%; left: 65%; width: 28vmin; }
-#gulu-cat:hover { transform: rotate(10deg); }
+/* --- 场景1 & 2 --- */
+.intro-content, .text-block { position: relative; z-index: 10; text-align: center; text-shadow: 0 2px 15px rgba(0,0,0,0.7); }
+.intro-content h1 { font-size: 8vmin; }
+.intro-content p { font-size: 3vmin; margin-top: 1vh; opacity: 0.8; }
+.scroll-down-arrow { width: 2vmin; height: 2vmin; border: 0.3vmin solid var(--text-color); border-top: 0; border-left: 0; transform: rotate(45deg); margin: 5vh auto; animation: bounce 2s infinite; }
+@keyframes bounce { 50% { transform: translateY(15px) rotate(45deg); } }
 
-.scroll-down-prompt { position: absolute; bottom: 5%; left: 50%; transform: translateX(-50%); opacity: 0.7; animation: fadeBlink 2s infinite; }
-@keyframes fadeBlink { 50% { opacity: 0.2; } }
+.scene-main { flex-direction: column; }
+.text-block { margin-bottom: 5vh; }
+.text-block p { font-size: calc(1rem + 2vmin); line-height: 1.8; }
+.cat { position: relative; cursor: pointer; transition: transform 0.3s ease-out; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.4)); }
+#cat1 { width: 25vmin; z-index: 5; }
+#cat1:hover { animation: purr 0.5s ease-in-out infinite; }
+@keyframes purr { 50% { transform: translateY(-5px); } }
+#gulu-cat { width: 30vmin; margin-left: -5vmin; }
+.gulu-head { transition: transform 0.2s ease-out; }
+.eye { animation: blink 5s infinite; } @keyframes blink { 99% { transform: scaleY(0.1); } }
+.tail { transform-origin: bottom left; animation: tail-twitch 3s ease-in-out infinite; } @keyframes tail-twitch { 50% { transform: rotate(-15deg); } }
 
-/* --- 场景2: 信 --- */
-.scene-letter { background-color: #382e28; }
+/* --- 场景3: 信 --- */
+.scene-letter { background: rgba(43,35,32,0.5); backdrop-filter: blur(5px); }
 .letter-card { background: rgba(255, 250, 240, 0.95); color: #4d3b36; padding: 6vmin; border-radius: 10px; width: 90%; max-width: 600px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); text-align: center; }
-.letter-card h2 { font-size: 5vmin; margin-bottom: 4vmin; font-weight: 700; }
+.letter-card h2, .letter-card p, .signature { text-shadow: none; }
+.letter-card h2 { font-size: 5vmin; margin-bottom: 4vmin; }
 .letter-card p { font-size: 2.5vmin; line-height: 2; margin-bottom: 2.5vmin; }
-.signature { text-align: right; margin-top: 5vmin; font-size: 3vmin; line-height: 1.6; }
+.signature { text-align: right; margin-top: 5vmin; font-size: 3vmin; }
 
-/* --- 音乐开关 --- */
+/* --- 通用 & 其他 --- */
+.fade-in { opacity: 0; transform: translateY(30px); transition: opacity 1.2s cubic-bezier(0.19, 1, 0.22, 1), transform 1.2s cubic-bezier(0.19, 1, 0.22, 1); }
+.fade-in.is-visible { opacity: 1; transform: translateY(0); }
+.heart { position: absolute; width: 10px; height: 10px; background: var(--accent-color); pointer-events: none; opacity: 1; }
+.heart::before, .heart::after { content: ''; width: 10px; height: 10px; background: var(--accent-color); border-radius: 50%; position: absolute; }
+.heart::before { top: -5px; left: 0; } .heart::after { top: 0; left: -5px; }
+@keyframes love { to { transform: translateY(-150px) rotate(360deg); opacity: 0; } }
 #music-toggle { position: fixed; bottom: 20px; right: 20px; width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; color: #fff; z-index: 100; transition: opacity 0.5s; }
 #music-toggle.playing { color: var(--accent-color); }
