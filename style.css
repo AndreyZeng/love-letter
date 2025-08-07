@@ -1,309 +1,200 @@
-// 大师级互动脚本
-document.addEventListener('DOMContentLoaded', () => {
-  // -- 元素获取 --
-  const curtain = document.getElementById('curtain');
-  const startButton = document.getElementById('start-button');
-  const storybook = document.getElementById('storybook');
-  const bgm = document.getElementById('bgm');
-  const musicToggle = document.getElementById('music-toggle');
-  const fadeInElements = document.querySelectorAll('.fade-in');
+:root {
+  --accent: #efbf8a;
+  --accent2: #ee9282;
+  --deep-bg: #2b2320;
+  --paper: #f9f5f2;
+  --emboss: 0 2px 5px #fff3, 0 1px 5px #d3a87488;
+  --shadow: 0 6px 32px 0 #442b1477;
+  --cat-glow: 0 0 40px 10px #fff1b890;
+  --font-main: 'Noto Serif SC', 'Quicksand', serif;
+  --font-logo: 'Pacifico', cursive;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html,body { height:100%; width:100%; background:var(--deep-bg); }
+body { font-family:var(--font-main); background:var(--deep-bg); color:#fff; letter-spacing:0.01em; overflow:hidden; }
+.hidden { display:none!important; }
 
-  // -- 开幕 --
-  startButton.addEventListener('click', () => {
-    try{bgm.play();}catch(e){}
-    setTimeout(()=>curtain.classList.add('hidden'), 1400);
-    curtain.style.opacity = '0';
-    storybook.classList.remove('hidden');
-    document.body.style.overflow = 'auto';
-    setTimeout(()=>storybook.classList.add('visible'),50);
-    musicToggle.classList.remove('hidden');
-    musicToggle.classList.add('playing');
-  }, { once:true });
+#curtain {
+  position:fixed; inset:0; background:#080702;
+  z-index:9999;
+  display:flex; justify-content:center; align-items:center;
+  transition:opacity 1.4s cubic-bezier(.5,.1,.2,1); }
+#start-button {
+  font-family:var(--font-logo);
+  font-size:clamp(2.2rem,5vw,3.5rem);
+  color:#fff7;
+  background:linear-gradient(100deg, #49423a 30%, #fff1ee38 100%);
+  border: none;
+  border-radius:40px; padding:1.2em 2.6em; cursor:pointer;
+  box-shadow:var(--shadow); letter-spacing:.2em; 
+  position:relative;
+  overflow:hidden;
+  filter:drop-shadow(0 2px 16px #fff8);
+  transition:background .3s,color .3s;
+  outline:none; isolation:isolate;
+}
+#start-button:hover { color:#fff; background:linear-gradient(100deg, #fffbeea2 0%, var(--accent) 100%); }
+#start-button .start-flare {
+  position:absolute; top:50%; left:55%; pointer-events:none;
+  width:160px; height:50px; background:radial-gradient(circle at 70% 50%,#fff2a0cc 30%,#fd93 70%,transparent 100%);
+  mix-blend-mode:soft-light; border-radius:50%;
+  opacity:.95; box-shadow:0 0 40px 0 #ffd 80%;
+  filter: blur(14px); transform:translate(-50%,-50%); 
+  animation: flare-move 2.8s infinite linear;
+}
+@keyframes flare-move { 0%{left:49%; opacity:1;} 40%{opacity:.93;} 60%{left:61%; opacity:.97;} 100%{left:49%;opacity:1;} }
 
-  // -- 渐显/滚动进入 --
-  const observer = new IntersectionObserver(entries=>{
-    entries.forEach(e=>{
-      if(e.isIntersecting) e.target.classList.add('is-visible');
-    });
-  },{ threshold: .36 });
-  fadeInElements.forEach(el=>observer.observe(el));
+/* 故事书层 */
+#background-3d {
+  position:fixed; inset:0; z-index:-20; overflow:hidden; pointer-events:none;
+}
+#bg-canvas { position:absolute; inset:0; width:100vw; height:100vh; background:transparent; }
+#ambient-glow {
+  position:absolute; inset:0; background:
+    radial-gradient(circle at 60% 55%, #ffe5c248 0%,transparent 28%),
+    radial-gradient(circle at 80% 80%, #dfcfb288 0%, transparent 45%);
+  pointer-events:none;
+  mix-blend-mode:screen;
+}
+#bg-overlay {
+  position:absolute; inset:0;
+  background:linear-gradient(145deg, transparent 60%, #3333 100%), linear-gradient(5deg, #00000040 15%, transparent 60%);
+  pointer-events:none;
+  z-index:4;
+}
 
-  // -- 音乐控制 --
-  musicToggle.addEventListener('click', ()=>{
-    if(bgm.paused){ bgm.play(); musicToggle.classList.add('playing'); }
-    else{ bgm.pause(); musicToggle.classList.remove('playing'); }
-  });
+#leaves-canvas {
+  position:fixed; top:0; left:0; width:100vw; height:100vh; pointer-events:none; z-index:-10;
+  filter: blur(.1px) contrast(108%);
+}
+.scene {
+  min-height:calc(100vh - 0.1px); min-width:100vw;
+  display:flex; align-items:center; justify-content:center;
+  position:relative; scroll-snap-align:start; overflow:hidden;
+}
+.scene-intro {
+  background:rgba(0,0,0,0.15); position:relative;
+}
+.intro-content {
+  color:#fff; text-align:center; text-shadow:0 4px 30px #2e151188;
+}
+.intro-content h1 {
+  font-size:clamp(2.8rem,6vw,5rem); letter-spacing:.07em; 
+  font-family:var(--font-logo), var(--font-main); font-weight:700;
+  filter:drop-shadow(0 4px 18px #fff5);
+  text-shadow: var(--emboss);
+  margin-bottom:.5em;
+}
+.subline { font-size:1.5rem; margin-bottom:2.7em; opacity:.78; font-family:var(--font-main);}
+.scroll-indicator { margin:3em auto 0 auto; width:4em; }
+.arrow {
+  width:20px; height:20px; border:solid #fff; border-width:0 0 5px 5px;
+  border-radius:2px;
+  display:inline-block;
+  transform:rotate(45deg); animation:arrowB 1.3s infinite cubic-bezier(.2,.7,.4,1.2);
+  margin:0 auto;
+}
+@keyframes arrowB { 0%,100%{transform:translateY(0) rotate(45deg);} 40%{transform:translateY(10px) rotate(45deg);} }
 
-  // ========== 浅3D动态背景 =
-  // 背景 Canvas 层：多重Ken Burns+微光波动
-  {
-    const bgCanvas = document.getElementById('bg-canvas');
-    const ctx = bgCanvas.getContext('2d');
-    let bgImg = new window.Image();
-    bgImg.src = "https://images.pexels.com/photos/236047/pexels-photo-236047.jpeg?auto=compress&q=80&w=1600"; // 优雅室内+光
-    const drawBG = ()=>{
-      let w = window.innerWidth, h = window.innerHeight;
-      bgCanvas.width = w; bgCanvas.height = h;
-      // 多层ken burns
-      let t = Date.now()/23000;
-      let scale = 1.08+0.03*Math.sin(t*2);
-      let dx = (w-bgImg.width*scale)/2 + Math.sin(t/2)*16;
-      let dy = (h-bgImg.height*scale)/3.5 + Math.cos(t/1.3)*10;
-      ctx.globalAlpha = .97; ctx.clearRect(0,0,w,h);
-      ctx.filter = "blur(0.9px) brightness(1.045)"; 
-      if(bgImg.complete)
-        ctx.drawImage(bgImg, dx, dy, bgImg.width*scale, bgImg.height*scale);
-      ctx.filter = "blur(0px)";
-      // 动态光斑
-      for(let i=0;i<3;i++){
-        ctx.save();
-        ctx.globalAlpha = 0.08 + 0.07*Math.abs(Math.sin(t*(.88+i*.7)));
-        ctx.translate(w/2, h/2);
-        ctx.rotate( Math.sin(t+i*2)*0.04 );
-        ctx.beginPath();
-        ctx.arc(0,0, w*(.28+.13*i+Math.sin(t+i)*.02), 0,2*Math.PI);
-        ctx.fillStyle = i%2?"#ffe7b9":"#fdd6c2";
-        ctx.fill();
-        ctx.restore();
-      }
-    };
-    bgImg.onload = ()=>{ drawBG(); };
-    setInterval(drawBG, 46);
-    window.addEventListener('resize', drawBG);
-  }
-  // =========== 真实3D叶片效果 ===========
-  {
-    const leafShapes = [
-      // 3种leaf SVG path
-      'M10 10 Q 18 2, 28 12 Q38 25 25 35 Q12 48 8 30 Q4 18 10 10 Z',
-      'M14 6 Q24 -2 32 10 Q40 20 25 29 Q10 36 9 19 Q8 9 14 6 Z',
-      'M12 13 Q18 3 28 14 Q38 23 23 33 Q8 45 10 28 Q11 19 12 13 Z',
-    ];
-    const leafColors = [
-      "#eac298","#e39651","#f5dc9b","#c2762f","#f7be7d","#bba88e","#eed7a5","#efa585"
-    ];
-    const leavesCan = document.getElementById('leaves-canvas');
-    leavesCan.width = window.innerWidth;
-    leavesCan.height = window.innerHeight;
-    const ctx2 = leavesCan.getContext('2d');
-    let winW = window.innerWidth, winH = window.innerHeight;
-    let leaves = [];
-    function resetLeaves(){
-      winW = window.innerWidth; winH = window.innerHeight;
-      leaves = [];
-      for(let i=0;i<45;i++){
-        const type = Math.floor(Math.random()*leafShapes.length);
-        const size = 22+Math.random()*48;
-        leaves.push({
-          type, size, 
-          x: Math.random()*winW,
-          y: -Math.random()*winH,
-          z: .85 + Math.random()*0.68,
-          vy: 1.6+Math.random()*1.5,
-          rot: Math.random()*Math.PI*2,
-          rotSpeed: (Math.random()-.5)*.028,
-          color: leafColors[Math.floor(Math.random()*leafColors.length)],
-          alpha: .7+.25*Math.random(),
-        });
-      }
-    }
-    function drawLeaf(leaf,shape){
-      ctx2.save();
-      ctx2.globalAlpha = leaf.alpha * (leaf.z<1.1?.92:1);
-      ctx2.translate(leaf.x, leaf.y);
-      ctx2.scale(leaf.z, leaf.z* (1 + 0.2*Math.sin(Date.now()/210+leaf.x)));
-      ctx2.rotate(leaf.rot);
-      ctx2.shadowBlur = 10*leaf.z;
-      ctx2.shadowColor = "#cf8f3baf";
-      ctx2.beginPath();
-      new Path2D(shape).path.forEach(seg=>ctx2.lineTo(seg[0],seg[1]));
-      ctx2.fillStyle = leaf.color;
-      ctx2.arc(0,leaf.size/2, leaf.size/4, 0,2*Math.PI); // 叶脉部高亮
-      ctx2.fill();
-      ctx2.restore();
-    }
-    function leafPathFromSVG(svgd){
-      // 轻量SVG path to array
-      let matches = svgd.match(/[MLQZ][^MLQZ]*/g)
-      const arr = [];
-      let pos = [0,0];
-      for(const m of matches){
-        let cmd=m[0], nums = m.slice(1).trim().split(/[\s,]+/).map(Number);
-        if(cmd==='M') pos=[nums[0],nums[1]], arr.push([pos[0],pos[1]]);
-        if(cmd==='Q') {/*略*/} /*省略细分，可画大致*/
-        if(cmd==='L') arr.push([nums[0],nums[1]]);
-        if(cmd==='Z') arr.push(arr[0]);
-      }
-      return {path: arr};
-    }
-    let parsedShapes = leafShapes.map(leafPathFromSVG);
-    function animateLeaves(){
-      ctx2.clearRect(0,0,winW,winH);
-      leaves.forEach(leaf=>{
-        leaf.y += leaf.vy * leaf.z;
-        leaf.x += Math.sin(leaf.y/60+leaf.type)*.95;
-        // 风吹横摆
-        leaf.rot += leaf.rotSpeed;
-        if(leaf.y>winH+55){
-          leaf.y = -22; leaf.x = Math.random()*winW; leaf.z = .85 + Math.random()*0.68;
-        }
-        drawLeaf(leaf, parsedShapes[leaf.type]);
-      });
-      requestAnimationFrame(animateLeaves);
-    }
-    resetLeaves();
-    animateLeaves();
-    window.addEventListener('resize', ()=>{
-      leavesCan.width = window.innerWidth; leavesCan.height = window.innerHeight; resetLeaves();
-    });
-  }
+.scene-main { background:rgba(230,205,183,.03); }
+.composition {
+  width:94vw; max-width:1160px;
+  display:grid; grid-template-columns: 1fr 3fr 1fr;
+  align-items:center;
+  gap:2vw;
+  justify-content:space-between;
+  min-height:65vh;
+}
+.l-pane,.r-pane { display:flex; flex-direction:column; align-items:center;}
+.c-pane { display:flex; flex-direction:column; justify-content:center; align-items:center;}
+.cat { position:relative; cursor:pointer; user-select:none; }
+#cat1 { width:23vw; min-width:180px; aspect-ratio:1.3; margin-right: min(2vw,30px); }
+#gulu-cat { width:26vw; min-width:210px; aspect-ratio:1.15; margin-left:min(2vw,30px);}
+.interactive svg { display:block; width:100%; height:auto; filter:var(--cat-glow) blur(.2px); z-index:3; }
+.interactive:active svg { filter: drop-shadow(0 0 36px #fffad277) contrast(1.1); }
+#gulu-cat .love-canvas { position:absolute; left:0;top:0;width:100%;height:100%; pointer-events:none; z-index:7;}
+.cat .purr-bubble { pointer-events:none; }
 
-  // ========== 猫咪互动 =============
-  // 【1】活猫互动——眼珠、头、耳朵追随
-  {
-    const guluSvG = document.getElementById('gulu-svg');
-    const guluHeadGroup = guluSvG ? guluSvG.querySelector('.gulu-head-group') : null;
-    const guluEyesL = guluSvG ? guluSvG.querySelector('.eye-g.l') : null;
-    const guluEyesR = guluSvG ? guluSvG.querySelector('.eye-g.r') : null;
-    const guluBallL = guluSvG ? guluSvG.querySelector('.eye-gball.l') : null;
-    const guluBallR = guluSvG ? guluSvG.querySelector('.eye-gball.r') : null;
-    const guluEarL = guluSvG ? guluSvG.querySelector('.ear-g.l') : null;
-    const guluEarR = guluSvG ? guluSvG.querySelector('.ear-g.r') : null;
-    let lastAngle = 0;
-    if(guluHeadGroup && guluEyesL && guluEyesR){
-      document.addEventListener('mousemove', evt => {
-        const rect = guluSvG.getBoundingClientRect();
-        const cx = rect.left+rect.width/2, cy = rect.top+rect.height/5;
-        const dx = evt.clientX-cx, dy=evt.clientY-cy;
-        let angle = Math.atan2(dy,dx);
-        let deg = Math.max(-28, Math.min(28, angle*180/Math.PI));
-        guluHeadGroup.setAttribute('transform',`rotate(${deg*0.55})`);
-        // 眼珠移动范围限制（独立+非线性）
-        const eyeballX = Math.max(-2,Math.min(2,dx/35));
-        const eyeballY = Math.max(-2,Math.min(2,dy/39));
-        guluBallL && guluBallL.setAttribute('cx',41+eyeballX);
-        guluBallR && guluBallR.setAttribute('cx',61+eyeballX);
-        guluBallL && guluBallL.setAttribute('cy',45+eyeballY);
-        guluBallR && guluBallR.setAttribute('cy',45+eyeballY);
-        // 耳朵轻微动
-        guluEarL && guluEarL.setAttribute('transform',`rotate(${deg*0.2} 32 24)`);
-        guluEarR && guluEarR.setAttribute('transform',`rotate(${deg*0.2} 68 24)`);
-        lastAngle=deg;
-      });
-      setInterval(()=>{
-        // 偶尔眨眼
-        if(Math.random()<.04){
-          guluEyesL.setAttribute('ry',2.5);
-          guluEyesR.setAttribute('ry',2.5);
-          setTimeout(()=>{
-            guluEyesL.setAttribute('ry',7);
-            guluEyesR.setAttribute('ry',7);
-          },205+Math.random()*120);
-        }
-      }, 180);
-    }
-  }
-  // 【2】咕噜猫爱心粒子特效
-  {
-    const guluCat = document.getElementById('gulu-cat');
-    const loveCanvas = guluCat? guluCat.querySelector('.love-canvas'):null;
-    if(guluCat && loveCanvas){
-      loveCanvas.width = guluCat.offsetWidth; loveCanvas.height = guluCat.offsetHeight;
-      function createHearts(x,y){
-        const hearts = [];
-        for(let i=0;i<16;i++)
-          hearts.push({
-            x,y,r:14+Math.random()*8,
-            dX: (Math.random()-.5)*2.8,
-            dY: -1.5-Math.random()*1.8,
-            alpha:1, t:0,
-            color:`hsl(${Math.floor(12+Math.random()*23)},89%,${72+Math.random()*20}%)`
-          });
-        return hearts;
-      }
-      let particles=[];
-      function render(){
-        if(!loveCanvas.width) return requestAnimationFrame(render);
-        const ctx = loveCanvas.getContext('2d');
-        ctx.clearRect(0,0,loveCanvas.width,loveCanvas.height);
-        for(let i=particles.length-1;i>=0;--i){
-          const p = particles[i];
-          p.x += p.dX; p.y += p.dY;
-          p.t+=1; p.alpha-=.016+Math.random()*0.011;
-          drawHeart(ctx,p.x,p.y,p.r,p.color,p.alpha);
-          if(p.alpha<=0.02) particles.splice(i,1);
-        }
-        requestAnimationFrame(render);
-      }
-      render();
-      guluCat.addEventListener('click',e=>{
-        const rect = loveCanvas.getBoundingClientRect();
-        const x=e.clientX-rect.left, y=e.clientY-rect.top;
-        particles.push(...createHearts(x,y));
-        // 金色小水波
-        setTimeout(() => {
-          for(let i=0;i<4;i++)
-            particles.push({
-              x, y, r:30+Math.random()*14,
-              dX:(Math.random()-.5)*1.3, dY:(Math.random()-.5)*1.3,
-              color:'#ffd88a',
-              alpha:0.25, t:0
-            });
-        }, 145);
-      });
-      function drawHeart(ctx,x,y,r,color,alpha){ // bezier heart
-        ctx.save();
-        ctx.globalAlpha=alpha;
-        ctx.translate(x,y); ctx.scale(r/18,r/18);
-        ctx.beginPath();
-        ctx.moveTo(0,-3);
-        ctx.bezierCurveTo(-7,-14, -25,5, 0,18);
-        ctx.bezierCurveTo(25,5, 7,-14, 0,-3);
-        ctx.closePath();
-        ctx.fillStyle=color; ctx.shadowColor=color; ctx.shadowBlur=11;
-        ctx.fill();
-        ctx.restore();
-      }
-      window.addEventListener('resize',()=>{
-        loveCanvas.width = guluCat.offsetWidth; loveCanvas.height = guluCat.offsetHeight;
-      });
-    }
-  }
-  // 【3】“撸猫”满足与呼噜粒子气泡
-  {
-    const cat1 = document.getElementById('cat1');
-    const purrSound = document.getElementById('purr-sound');
-    const purrBubbleLayer = cat1 ? cat1.querySelector('.purr-bubble') : null;
-    if(cat1 && purrBubbleLayer){
-      cat1.addEventListener('mouseenter',()=>{
-        // 满足眯眼
-        const svg = document.getElementById('cat1-svg');
-        const eyeL = svg.querySelector('.eye.left'), eyeR = svg.querySelector('.eye.right'), smile = svg.querySelector('.smile');
-        eyeL.setAttribute('ry',4); eyeR.setAttribute('ry',4);
-        smile.setAttribute('d','M38,54 Q45,61,52,54');
-        // 呼噜气泡
-        for(let i=0;i<3;i++) showBubble(svg,34+Math.random()*34, 22+Math.random()*25);
-        purrSound && purrSound.play();
-        svg.style.animation = 'purr .5s ease-in-out infinite';
-      });
-      cat1.addEventListener('mouseleave',()=>{
-        // 还原表情
-        const svg = document.getElementById('cat1-svg');
-        const eyeL = svg.querySelector('.eye.left'), eyeR = svg.querySelector('.eye.right'), smile = svg.querySelector('.smile');
-        eyeL.setAttribute('ry',6); eyeR.setAttribute('ry',6);
-        smile.setAttribute('d','M38,54 Q45,58,52,54');
-        svg.style.animation = '';
-      });
-      function showBubble(svg,cx,cy){
-        const group = svg.querySelector('.head-group');
-        const bubble = document.createElementNS("http://www.w3.org/2000/svg","ellipse");
-        bubble.setAttribute('class','purr-bubble');
-        bubble.setAttribute('cx',cx); bubble.setAttribute('cy',cy);
-        bubble.setAttribute('rx','3.3'); bubble.setAttribute('ry','2');
-        bubble.setAttribute('fill','#fff9b5');
-        group.appendChild(bubble);
-        setTimeout(()=>bubble.remove(), 1200+Math.random()*600);
-      }
-    }
-  }
-});
+.blessing-text { font-size:clamp(1.3rem,2.3vw,2.3rem); color: #fff9; border-radius:8px; margin:2vw 0 0 0; text-shadow:0 2px 6px #ad8d7288, 0 5px 30px #0009;}
+.fade-in { opacity:0; transform:translateY(40px); transition: opacity .95s cubic-bezier(.7,.15,.15,1), transform .89s cubic-bezier(.7,.09,.27,1);}
+.fade-in.is-visible {opacity:1;transform:translateY(0);}
+
+.scene-letter {
+  background: linear-gradient(120deg, #13111088 0%,  #efe2d840 100%);
+  backdrop-filter:blur(8px);
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 -32px 60px #0005 inset;
+  padding:10vh 0 10vh 0;
+}
+.letter-card {
+  background:var(--paper); color:#4b2a19; margin:4vh auto;
+  padding: 3.2vw 5vw; border-radius:18px; box-shadow:var(--shadow);
+  font-size:1.7rem; line-height:1.9; font-family:var(--font-main);
+  max-width:520px; width:91vw; 
+  text-align:center; border:1.7px solid #f2e3d1bb;
+  position:relative;
+}
+.letter-card h2 {
+  font-family:var(--font-logo); color:var(--accent2);
+  font-size:2.55em; margin-bottom:.75em;
+  line-height:1.08em; letter-spacing:.17em;
+}
+.signature { color:var(--accent2); margin-top:2.7em;
+  font-size:1.2em; text-align:right; font-family:var(--font-logo);
+  filter:drop-shadow(0 0 11px #fff3);
+}
+@media (max-width:768px) {
+  .composition { grid-template-columns: 1fr; }
+  .l-pane,.r-pane { margin:0 0 6vw 0;}
+  #cat1,#gulu-cat { width:60vw; min-width:140px;}
+}
+
+#music-toggle {
+  position:fixed; bottom:26px; right:24px;
+  width:54px; height:54px; border-radius:50%;
+  background:rgba(230,205,183,0.20); color:var(--accent2);
+  box-shadow:0 3px 24px #af8b6420;
+  cursor:pointer; z-index:25;
+  display:flex; justify-content:center; align-items:center;
+  font-size:2.12rem;
+  opacity:.8; transition:opacity .38s, background .2s;
+  outline:none; border:none; filter:drop-shadow(0 2px 24px #fff3);
+}
+#music-toggle:hover { opacity:1; background: #efbf8a44; }
+#music-toggle.playing { color: #ea604f; background: #fffbeea8; filter:drop-shadow(0 0 21px #ea604b60); }
+#music-toggle .note { animation: musicpulse 3s infinite; }
+@keyframes musicpulse { 60% { transform:scale(1.12) rotate(-8deg); color:var(--accent2);} }
+
+.heart-spark{
+  position: absolute;
+  width: 22px; height: 19px;
+  left:0;top:0;
+  background: none;
+  pointer-events: none;
+  filter: drop-shadow(0 0 16px #ffecd7cc);
+  z-index:55;
+  opacity:1;
+  animation: heartSparkle .95s cubic-bezier(.4,.65,.33,1.18) forwards;
+}
+.heart-spark svg {width:100%;height:100%;}
+@keyframes heartSparkle {
+  0% { opacity:1; transform: scale(.4) translateY(0) rotate(-16deg); }
+  35%{ opacity:.97;}
+  70%{ opacity:1; }
+  90%{ opacity: .7; }
+  100%{ opacity:0; transform:scale(1.26) translateY(-98px) rotate(80deg);}
+}
+/* 呼噜气泡 */
+.purr-bubble {
+  position: absolute;
+  left: 40px; top: 22px; width: 22px; height: 22px;
+  opacity: 0; z-index:40;
+  animation: bubbleUp .9s cubic-bezier(.22,.88,.49,1.31) forwards;
+}
+@keyframes bubbleUp {
+  0% { opacity: 0.1; transform: scale(.55) translateY(0);}
+  25%{ opacity:.85;}
+  70%{opacity:.89;}
+  90%{opacity:0.7;}
+  100% { opacity: 0; transform: scale(1.7) translateY(-32px);}
+}
