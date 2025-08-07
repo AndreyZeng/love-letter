@@ -2,8 +2,8 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>一份慢慢展开的秋日画卷</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>一件只属于周鑫楠的珍藏品</title>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,78 +11,55 @@
 </head>
 <body>
 
-    <main class="storybook-container">
-        <!-- 初始引导 -->
-        <section class="scene scene-intro">
-            <h1>给鑫楠的秋日画卷</h1>
-            <p>请向下滑动，慢慢展开...</p>
-            <div class="scroll-down-arrow"></div>
-        </section>
+    <div class="diorama-container">
+        <div class="diorama-box">
+            <!-- Layer -4: Background Gradient -->
+            <div class="layer layer-bg"></div>
 
-        <!-- 场景：家的角落 (结构重组) -->
-        <section class="scene scene-room">
-            <!-- 房间背景层 -->
-            <div class="room-bg"></div>
+            <!-- Layer -3: Falling Leaves -->
+            <div class="layer layer-leaves">
+                <!-- JS will generate leaves here -->
+            </div>
 
-            <!-- 窗户 (所有窗外景物都在里面) -->
-            <div class="window-container" data-speed="0.3">
-                <div class="window-pane">
-                    <div class="distant-hills"></div>
-                    <div class="leaves-container"></div>
+            <!-- Layer -1: Companion Cat -->
+            <div class="layer layer-cat-1">
+                <div class="cat" id="cat1">
+                    <svg viewBox="0 0 100 100"><path d="M 50,95 C 20,95 20,60 50,60 S 80,95 50,95 Z" fill="#b0a59a"/><circle cx="50" cy="45" r="20" fill="#b0a59a"/><path d="M 35,30 Q 30,15 45,25" fill="#b0a59a"/><path d="M 65,30 Q 70,15 55,25" fill="#b0a59a"/><path d="M 42,45 C 45,48 48,45 42,45" stroke="black" stroke-width="1.5" fill="none" class="eye"/><path d="M 58,45 C 55,48 52,45 58,45" stroke="black" stroke-width="1.5" fill="none" class="eye"/></svg>
                 </div>
             </div>
 
-            <!-- 前景内容 -->
-            <div class="foreground-content">
-                <div class="text-block" data-speed="0.6">
-                    <p class="fade-in">秋天，<br>是思念开始变得温热的季节。</p>
-                    <p class="fade-in">我想为你创造一个温暖的小世界，<br>就像这幅画卷一样...</p>
+            <!-- Layer 0: Gulu (The Star) -->
+            <div class="layer layer-gulu">
+                <div class="cat" id="gulu-cat" title="点击咕噜，开启约定">
+                     <svg viewBox="0 0 100 100"><path d="M 20,80 C 10,60 30,50 50,55 C 80,60 90,80 80,80 Z" fill="#d4c8be"/><circle cx="70" cy="45" r="15" fill="#d4c8be"/><path d="M 60,35 Q 55,25 65,32" fill="#d4c8be"/><path d="M 80,35 Q 85,25 75,32" fill="#d4c8be"/><path d="M 65,45 C 67,47 69,45 65,45" stroke="black" stroke-width="1" fill="none" class="eye"/><path d="M 75,45 C 73,47 71,45 75,45" stroke="black" stroke-width="1" fill="none" class="eye"/><path d="M 20,75 Q 5,70 15,60" stroke="#d4c8be" stroke-width="5" fill="none" class="tail"/><path d="M 60,58 A 15 15 0 0 1 80 58" stroke="#e58a70" stroke-width="2.5" fill="none"/></svg>
                 </div>
-
-                <div class="cat-group" data-speed="0.8">
-                    <div class="cat" id="cat1" title="可以“撸”一下这只猫哦">
-                        <svg viewBox="0 0 100 100"><path d="M 50,95 C 20,95 20,60 50,60 S 80,95 50,95 Z" fill="#b0a59a"/><circle cx="50" cy="45" r="20" fill="#b0a59a"/><path d="M 35,30 Q 30,15 45,25" fill="#b0a59a"/><path d="M 65,30 Q 70,15 55,25" fill="#b0a59a"/><path d="M 42,45 C 45,48 48,45 42,45" stroke="black" stroke-width="1.5" fill="none" class="eye"/><path d="M 58,45 C 55,48 52,45 58,45" stroke="black" stroke-width="1.5" fill="none" class="eye"/></svg>
-                    </div>
-                    <div class="cat" id="gulu-cat" title="咕噜在看着你呢">
-                        <svg viewBox="0 0 100 100">
-                            <g class="gulu-body">
-                                <path d="M 20,80 C 10,60 30,50 50,55 C 80,60 90,80 80,80 Z" fill="#d4c8be"/>
-                                <path d="M 20,75 Q 5,70 15,60" stroke="#d4c8be" stroke-width="5" fill="none" class="tail"/>
-                            </g>
-                            <g class="gulu-head">
-                                <circle cx="70" cy="45" r="15" fill="#d4c8be"/>
-                                <path d="M 60,35 Q 55,25 65,32" fill="#d4c8be"/>
-                                <path d="M 80,35 Q 85,25 75,32" fill="#d4c8be"/>
-                                <path d="M 65,45 C 67,47 69,45 65,45" stroke="black" stroke-width="1" fill="none" class="eye"/>
-                                <path d="M 75,45 C 73,47 71,45 75,45" stroke="black" stroke-width="1" fill="none" class="eye"/>
-                                <path d="M 60,58 A 15 15 0 0 1 80 58" stroke="#e58a70" stroke-width="2.5" fill="none"/>
-                            </g>
-                        </svg>
+            </div>
+            
+            <!-- Layer 2: The Letter (Initially hidden) -->
+            <div class="layer layer-letter hidden">
+                <div class="letter-content">
+                    <h2>给最爱的鑫楠：</h2>
+                    <p>这是一个被悄悄封装起来的秋日。你看，我和咕噜都在这里，静静地陪着你。</p>
+                    <p>我希望你的世界永远像这个小小的天地一样，被温柔和爱意包围，温暖、明亮，且不受打扰。</p>
+                    <p>我们的约定很简单：你要每天开开心心的，我们会永远在你身边。</p>
+                    <div class="signature">
+                        <p>—— 曾建勤 & 咕噜</p>
                     </div>
                 </div>
-
-                <!-- 隐藏彩蛋 -->
-                <div id="hidden-mouse" title="嘿！"></div>
             </div>
-        </section>
 
-        <!-- 场景：最终的约定 -->
-        <section class="scene scene-letter">
-            <div class="letter-card fade-in">
-                <h2>我们的秋日约定</h2>
-                <p>我希望你知道，无论何时，<br>这个温暖的角落永远为你敞开。</p>
-                <p>请一定每天都开开心心的，<br>好好照顾自己。</p>
-                <p>而我和咕噜，会一直在这里，<br>用我们全部的爱意和呼噜声，<br>永远陪着你。</p>
-                <div class="signature">
-                    <p>爱你的：曾建勤<br>& 你的咕噜</p>
-                </div>
-            </div>
-        </section>
-    </main>
-    
+            <!-- Layer 3: Foreground dust motes -->
+            <div class="layer layer-dust"></div>
+        </div>
+    </div>
+
+    <div class="prompt-initial">
+        <p>请触碰，以开启这份回忆</p>
+    </div>
+
     <audio id="bgm" src="bgm.mp3" loop></audio>
-    <div id="music-toggle">♫</div>
+    <div id="music-toggle" class="hidden">♫</div>
 
+    <script src="script.js"></script>
 </body>
-<script src="script.js"></script>
 </html>
