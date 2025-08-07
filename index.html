@@ -10,7 +10,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- 开场：信封 -->
     <div id="envelope-curtain">
         <div class="envelope-wrapper">
             <div class="envelope">
@@ -23,22 +22,28 @@
         <p class="prompt">请为我开启</p>
     </div>
 
-    <!-- 3D 景箱容器 -->
     <div class="diorama-container hidden">
         <div class="diorama-box">
-            <div class="layer layer-bg"></div>
-            <div class="layer layer-leaves"></div>
+            <!-- 升级：动态星空背景 -->
+            <div class="layer layer-sky">
+                <div id="starry-sky"></div>
+                <div id="shooting-star"></div>
+            </div>
+            
             <div class="layer layer-letter">
                 <div class="letter-content">
                     <h2>给最爱的鑫楠：</h2>
-                    <p>这是一个被悄悄封装起来的秋日。你看，我和咕噜都在这里，静静地陪着你。</p>
-                    <p>我希望你的世界永远像这个小小的天地一样，被温柔和爱意包围，温暖、明亮，且不受打扰。</p>
-                    <p>我们的约定很简单：你要每天开开心心的，我们会永远在你身边。</p>
-                    <div class="signature"><p>—— 曾建勤 & 咕噜</p></div>
+                    <p>我将这个秋日的星空封装起来，送给你。你看，我和咕噜都在这里，静静地陪着你。</p>
                 </div>
             </div>
+
+            <!-- 升级：祝福语动态呈现 -->
+            <div class="layer layer-wish">
+                <p id="wish-text"></p>
+            </div>
+
             <div class="layer layer-cat-1">
-                <div class="cat" id="cat1" title="喵~">
+                <div class="cat" id="cat1" title="轻抚我吧~">
                     <svg viewBox="0 0 100 100"><path d="M 50,95 C 20,95 20,60 50,60 S 80,95 50,95 Z" fill="#b0a59a"/><circle cx="50" cy="45" r="20" fill="#b0a59a"/><path d="M 35,30 Q 30,15 45,25" fill="#b0a59a"/><path d="M 65,30 Q 70,15 55,25" fill="#b0a59a"/><path d="M 42,45 C 45,48 48,45 42,45" stroke="black" stroke-width="1.5" fill="none" class="eye"/><path d="M 58,45 C 55,48 52,45 58,45" stroke="black" stroke-width="1.5" fill="none" class="eye"/></svg>
                 </div>
             </div>
@@ -47,7 +52,6 @@
                      <svg viewBox="0 0 100 100"><path d="M 20,80 C 10,60 30,50 50,55 C 80,60 90,80 80,80 Z" fill="#d4c8be"/><circle cx="70" cy="45" r="15" fill="#d4c8be"/><path d="M 60,35 Q 55,25 65,32" fill="#d4c8be"/><path d="M 80,35 Q 85,25 75,32" fill="#d4c8be"/><path d="M 65,45 C 67,47 69,45 65,45" stroke="black" stroke-width="1" fill="none" class="eye"/><path d="M 75,45 C 73,47 71,45 75,45" stroke="black" stroke-width="1" fill="none" class="eye"/><path d="M 20,75 Q 5,70 15,60" stroke="#d4c8be" stroke-width="5" fill="none" class="tail"/><path d="M 60,58 A 15 15 0 0 1 80 58" stroke="#e58a70" stroke-width="2.5" fill="none"/></svg>
                 </div>
             </div>
-            <div id="cat-tooltip" class="hidden"></div>
         </div>
     </div>
 
