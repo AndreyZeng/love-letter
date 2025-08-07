@@ -12,6 +12,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const bgm = document.getElementById('bgm');
     const musicToggle = document.getElementById('music-toggle');
     
+    // 对话框内容数组
+    const catDialogues = [
+        '主人，我也想你了~',
+        '今天有想我吗？',
+        '要一直陪着鑫楠哦',
+        '喵~ 爱你呢',
+        '你是我最重要的人'
+    ];
+    
     // --- 开幕逻辑 ---
     startButton.addEventListener('click', () => {
         curtain.style.opacity = '0';
@@ -37,73 +46,101 @@ document.addEventListener('DOMContentLoaded', () => {
         document.addEventListener('mousemove', e => handleMove(e.clientX, e.clientY));
         if (window.DeviceOrientationEvent) {
             if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-                DeviceOrientationEvent.requestPermission().then(state => { if (state === 'granted') window.addEventListener('deviceorientation', handleOrientation); }).catch(console.error);
-            } else { window.addEventListener('deviceorientation', handleOrientation); }
+                DeviceOrientationEvent.requestPermission().then(state => {
+                    if (state === 'granted') window.addEventListener('deviceorientation', handleOrientation);
+                }).catch(console.error);
+            } else {
+                window.addEventListener('deviceorientation', handleOrientation);
+            }
         }
     }
-    function handleMove(x, y) { const { clientWidth, clientHeight } = document.documentElement; const rotY = 15 * ((x - clientWidth / 2) / (clientWidth / 2)); const rotX = -15 * ((y - clientHeight / 2) / (clientHeight / 2)); diorama.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`; }
-    function handleOrientation(e) { const rotY = e.gamma * 0.5; const rotX = (e.beta - 45) * 0.5; diorama.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`; }
 
-    // --- 猫咪交互 ---
+    function handleMove(x, y) {
+        const { clientWidth, clientHeight } = document.documentElement;
+        const rotY = 15 * ((x - clientWidth / 2) / (clientWidth / 2));
+        const rotX = -15 * ((y - clientHeight / 2) / (clientHeight / 2));
+        diorama.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+    }
 
-    // 左猫(cat1)：显示对话框 + 触发爱心
+    function handleOrientation(e) {
+        const rotY = e.gamma * 0.5;
+        const rotX = (e.beta - 45) * 0.5;
+        diorama.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+    }
+
+    // --- 猫咪交互事件 ---
+    // 左猫：显示对话框 + 爱心特效
     cat1.addEventListener('click', (event) => {
         event.stopPropagation();
-        showCatDialogue('主人，我也想你了~');
+        const randomDialogue = catDialogues[Math.floor(Math.random() * catDialogues.length)];
+        showCatDialogue(randomDialogue);
         createClickHeart(event.clientX, event.clientY);
     });
 
-    // 右猫(guluCat)：仅触发爱心
+    // 右猫：仅爱心特效
     guluCat.addEventListener('click', (event) => {
         event.stopPropagation();
         createClickHeart(event.clientX, event.clientY);
     });
 
-    // --- 猫咪对话框函数 ---
+    // --- 显示猫咪对话框 ---
     function showCatDialogue(text) {
+        // 移除已存在的对话框
         const existingDialogue = cat1.querySelector('.cat-dialogue');
         if (existingDialogue) {
             existingDialogue.remove();
         }
 
+        // 创建新对话框
         const dialogue = document.createElement('div');
         dialogue.className = 'cat-dialogue';
         dialogue.textContent = text;
         
+        // 添加到猫咪元素中
         cat1.appendChild(dialogue);
 
+        // 3秒后自动移除
         setTimeout(() => {
-            dialogue.remove();
+            if (dialogue.parentNode) {
+                dialogue.remove();
+            }
         }, 3000);
     }
 
     // --- 爱心粒子效果 ---
     function createClickHeart(x, y) {
         const heartColors = ['#f2a699', '#e89f71', '#d4ac6e'];
+        const heartSVG = `<svg viewBox="0 0 24 24" style="width: 100%; height: 100%; fill: HEARTCOLOR;"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg>`;
         
         for (let i = 0; i < 15; i++) {
             const randomColor = heartColors[Math.floor(Math.random() * heartColors.length)];
-            const heartSVG = `<svg viewBox="0 0 24 24" style="width: 100%; height: 100%; fill: ${randomColor};"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg>`;
             const heart = document.createElement('div');
-            heart.innerHTML = heartSVG;
-            heart.style.position = 'fixed'; 
-            heart.style.left = `${x}px`; 
+            heart.innerHTML = heartSVG.replace('HEARTCOLOR', randomColor);
+            heart.style.position = 'fixed';
+            heart.style.left = `${x}px`;
             heart.style.top = `${y}px`;
             const size = 10 + Math.random() * 20;
-            heart.style.width = `${size}px`; 
+            heart.style.width = `${size}px`;
             heart.style.height = `${size}px`;
-            heart.style.pointerEvents = 'none'; 
+            heart.style.pointerEvents = 'none';
             heart.style.opacity = 1;
             heart.style.transition = 'transform 1s ease-out, opacity 1s ease-out';
             heart.style.transform = 'translate(-50%, -50%)';
+            heart.style.zIndex = 1000;
             document.body.appendChild(heart);
-            setTimeout(() => { 
-                const destX = (Math.random() - 0.5) * 300; 
-                const destY = (Math.random() - 0.5) * 300 - 150; 
-                heart.style.transform = `translate(${destX}px, ${destY}px) rotate(${(Math.random() - 0.5) * 720}deg) scale(0)`; 
-                heart.style.opacity = '0'; 
+            
+            setTimeout(() => {
+                const destX = (Math.random() - 0.5) * 300;
+                const destY = (Math.random() - 0.5) * 300 - 150;
+                heart.style.transform = `translate(${destX}px, ${destY}px) rotate(${(Math.random() - 0.5) * 720}deg) scale(0)`;
+                heart.style.opacity = '0';
             }, 10);
-            setTimeout(() => heart.remove(), 1010);
+            
+            setTimeout(() => {
+                if (heart.parentNode) {
+                    heart.remove();
+                }
+            }, 1010);
         }
     }
     
@@ -119,14 +156,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // --- 音乐控制 ---
-    musicToggle.addEventListener('click', () => { 
-        if (bgm.paused) { 
-            bgm.play(); 
-            musicToggle.classList.add('playing'); 
-        } else { 
-            bgm.pause(); 
-            musicToggle.classList.remove('playing'); 
-        } 
+    musicToggle.addEventListener('click', () => {
+        if (bgm.paused) {
+            bgm.play();
+            musicToggle.classList.add('playing');
+        } else {
+            bgm.pause();
+            musicToggle.classList.remove('playing');
+        }
     });
 
     // --- 生成星星 ---
@@ -134,8 +171,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const star = document.createElement('div');
         star.className = 'star';
         const size = Math.random() * 2 + 1;
-        star.style.width = `${size}px`; star.style.height = `${size}px`;
-        star.style.left = `${Math.random() * 100}%`; star.style.top = `${Math.random() * 100}%`;
+        star.style.width = `${size}px`;
+        star.style.height = `${size}px`;
+        star.style.left = `${Math.random() * 100}%`;
+        star.style.top = `${Math.random() * 100}%`;
         star.style.animationDelay = `${Math.random() * 5}s`;
         star.style.animationDuration = `${2 + Math.random() * 3}s`;
         starrySky.appendChild(star);
