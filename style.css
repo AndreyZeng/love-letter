@@ -1,76 +1,117 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // --- 元素获取 ---
-    const parallaxBG = document.querySelector('.parallax-bg');
-    const parallaxFG = document.querySelector('.parallax-fg');
-    const cats = document.querySelectorAll('.cat');
-    const tooltip = document.getElementById('cat-tooltip');
-    const bgm = document.getElementById('bgm');
-    const musicToggle = document.getElementById('music-toggle');
-    const fadeInElements = document.querySelectorAll('.fade-in');
+:root {
+    --bg-color: #4a3c35;
+    --text-color: #f3eada;
+    --accent-color: #e58a70;
+    --font-serif: 'Noto Serif SC', serif;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: var(--font-serif);
+    overflow-x: hidden;
+}
 
-    // --- 视差滚动逻辑 ---
-    window.addEventListener('scroll', () => {
-        const scrollY = window.scrollY;
-        // 移动背景和前景
-        if (parallaxBG) {
-            const bgSpeed = parallaxBG.dataset.speed;
-            parallaxBG.style.transform = `translateY(${scrollY * bgSpeed}px)`;
-        }
-        if (parallaxFG) {
-            const fgSpeed = parallaxFG.dataset.speed;
-            parallaxFG.style.transform = `translateY(${scrollY * fgSpeed}px)`;
-        }
-        
-        // 第一次滚动时播放音乐
-        if (bgm.paused && bgm.currentTime === 0) {
-            bgm.play().catch(()=>{});
-            musicToggle.classList.add('playing');
-        }
-    });
+/* --- 容器和场景基础 --- */
+.storybook-container { width: 100%; }
+.scene {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
 
-    // --- Intersection Observer 逻辑 (元素进入视野时添加动画类) ---
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('is-visible');
-            }
-        });
-    }, {
-        threshold: 0.1 // 元素进入10%时触发
-    });
-    fadeInElements.forEach(el => observer.observe(el));
-    
-    // --- 猫咪交互 ---
-    cats.forEach(cat => {
-        cat.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const message = cat.dataset.message;
-            const rect = cat.getBoundingClientRect();
+/* --- 场景1：初始引导 --- */
+.scene-intro {
+    text-align: center;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+.scene-intro h1 { font-size: 8vmin; font-weight: 700; }
+.scene-intro p { font-size: 3vmin; margin-top: 1vh; opacity: 0.8; }
+.scroll-down-arrow {
+    width: 2vmin; height: 2vmin;
+    border: 0.3vmin solid var(--text-color);
+    border-top: 0; border-left: 0;
+    transform: rotate(45deg);
+    margin-top: 5vh;
+    animation: bounce 2s infinite;
+}
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0) rotate(45deg); }
+    40% { transform: translateY(15px) rotate(45deg); }
+    60% { transform: translateY(7px) rotate(45deg); }
+}
 
-            tooltip.textContent = message;
-            tooltip.style.left = `${rect.left + rect.width / 2 - tooltip.offsetWidth / 2}px`;
-            tooltip.style.top = `${rect.top - tooltip.offsetHeight - 10}px`;
-            tooltip.classList.remove('hidden');
+/* --- 场景2：房间角落 --- */
+.scene-room { min-height: 180vh; /* 给予足够的滚动空间 */ }
+.parallax-bg, .parallax-fg {
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+}
+.window {
+    position: absolute; top: 15%; left: 10%;
+    width: 45vmin; height: 60vmin;
+    background: linear-gradient(to top, #c7bda1, #948a74);
+    border: 1.5vmin solid #fff;
+    border-radius: 1vmin;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+.leaves-container { position: absolute; width: 100%; height: 100%; }
+.leaf { position: absolute; width: 3vmin; height: 3vmin; background-color: var(--accent-color); border-radius: 0 50% 0 50%; opacity: 0.8; animation: fall 10s linear infinite; }
+@keyframes fall { from { transform: translateY(-10vh); } to { transform: translateY(180vh) rotate(360deg); } }
 
-            setTimeout(() => tooltip.classList.add('hidden'), 3000);
-        });
-    });
+.cat {
+    position: absolute;
+    width: 20vmin;
+    cursor: pointer;
+    transition: transform 0.3s;
+    filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3));
+}
+.cat:hover { transform: scale(1.05) translateY(-5px); }
+#cat1 { top: 40%; left: 45%; width: 18vmin; }
+#gulu-cat { top: 60%; left: 15%; width: 22vmin; }
+.eye { animation: blink 5s infinite; } @keyframes blink { 99% { transform: scaleY(0.1); } }
+.tail { transform-origin: bottom left; animation: tail-twitch 3s ease-in-out infinite; } @keyframes tail-twitch { 50% { transform: rotate(-15deg); } }
 
-    // --- 音乐控制 ---
-    musicToggle.addEventListener('click', () => {
-        if (bgm.paused) { bgm.play(); musicToggle.classList.add('playing'); } 
-        else { bgm.pause(); musicToggle.classList.remove('playing'); }
-    });
+.text-content {
+    position: relative;
+    width: 90%;
+    max-width: 600px;
+    text-align: right;
+    margin-top: 90vh; /* 将文字推到滚动区域下方 */
+    z-index: 10;
+}
+.text-content p {
+    font-size: 3.5vmin;
+    line-height: 1.8;
+    margin-bottom: 8vh;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
 
-    // --- 生成落叶 ---
-    const leavesContainer = document.querySelector('.leaves-container');
-    for (let i = 0; i < 20; i++) {
-        const leaf = document.createElement('div');
-        leaf.className = 'leaf';
-        leaf.style.left = `${Math.random() * 100}%`;
-        leaf.style.animationDelay = `${Math.random() * 10}s`;
-        const size = 1.5 + Math.random() * 1.5;
-        leaf.style.width = `${size}vmin`; leaf.style.height = `${size}vmin`;
-        leavesContainer.appendChild(leaf);
-    }
-});
+/* --- 场景3：最终的信 --- */
+.scene-letter { background-color: #3e322c; }
+.letter-card {
+    background: rgba(255, 250, 240, 0.95);
+    color: #4d3b36;
+    padding: 6vmin;
+    border-radius: 10px;
+    width: 90%; max-width: 600px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    text-align: center;
+}
+.letter-card h2 { font-size: 5vmin; margin-bottom: 4vmin; font-weight: 700; }
+.letter-card p { font-size: 2.5vmin; line-height: 2; margin-bottom: 2.5vmin; }
+.signature { text-align: right; margin-top: 5vmin; font-size: 3vmin; line-height: 1.6; }
+
+/* --- 通用 & 其他 --- */
+.fade-in { opacity: 0; transform: translateY(30px); transition: opacity 0.8s, transform 0.8s; }
+.fade-in.is-visible { opacity: 1; transform: translateY(0); }
+.hidden { display: none; }
+#cat-tooltip { position: fixed; background: rgba(0,0,0,0.7); color: white; padding: 10px 15px; border-radius: 8px; font-size: 0.9rem; pointer-events: none; z-index: 100; transition: opacity 0.3s; }
+#music-toggle { position: fixed; bottom: 20px; right: 20px; width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; color: #fff; z-index: 100; }
+#music-toggle.playing { color: var(--accent-color); }
