@@ -44,13 +44,13 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleMove(x, y) { const { clientWidth, clientHeight } = document.documentElement; const rotY = 15 * ((x - clientWidth / 2) / (clientWidth / 2)); const rotX = -15 * ((y - clientHeight / 2) / (clientHeight / 2)); diorama.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`; }
     function handleOrientation(e) { const rotY = e.gamma * 0.5; const rotX = (e.beta - 45) * 0.5; diorama.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`; }
 
-    // --- 核心修改：分离两只猫的点击事件 ---
+    // --- 猫咪交互 ---
 
     // 左猫(cat1)：显示对话框 + 触发爱心
     cat1.addEventListener('click', (event) => {
         event.stopPropagation();
-        showCatDialogue('主人，我也想你了~'); // 调用新函数显示对话
-        createClickHeart(event.clientX, event.clientY); // 同时触发爱心
+        showCatDialogue('主人，我也想你了~');
+        createClickHeart(event.clientX, event.clientY);
     });
 
     // 右猫(guluCat)：仅触发爱心
@@ -59,9 +59,8 @@ document.addEventListener('DOMContentLoaded', () => {
         createClickHeart(event.clientX, event.clientY);
     });
 
-    // --- 新增：显示猫咪对话框的函数 ---
+    // --- 猫咪对话框函数 ---
     function showCatDialogue(text) {
-        // 先移除可能已存在的对话框，防止重复
         const existingDialogue = cat1.querySelector('.cat-dialogue');
         if (existingDialogue) {
             existingDialogue.remove();
@@ -71,9 +70,8 @@ document.addEventListener('DOMContentLoaded', () => {
         dialogue.className = 'cat-dialogue';
         dialogue.textContent = text;
         
-        cat1.appendChild(dialogue); // 将对话框添加到猫咪的HTML元素中
+        cat1.appendChild(dialogue);
 
-        // 动画时长为3秒，结束后自动移除对话框
         setTimeout(() => {
             dialogue.remove();
         }, 3000);
@@ -82,10 +80,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- 爱心粒子效果 ---
     function createClickHeart(x, y) {
         const heartColors = ['#f2a699', '#e89f71', '#d4ac6e'];
-        const randomColor = heartColors[Math.floor(Math.random() * heartColors.length)];
-        const heartSVG = `<svg viewBox="0 0 24 24" style="width: 100%; height: 100%; fill: ${randomColor};"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg>`;
         
         for (let i = 0; i < 15; i++) {
+            const randomColor = heartColors[Math.floor(Math.random() * heartColors.length)];
+            const heartSVG = `<svg viewBox="0 0 24 24" style="width: 100%; height: 100%; fill: ${randomColor};"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg>`;
             const heart = document.createElement('div');
             heart.innerHTML = heartSVG;
             heart.style.position = 'fixed'; 
