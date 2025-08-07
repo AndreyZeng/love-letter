@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const cat1 = document.getElementById('cat1');
     const guluCat = document.getElementById('gulu-cat');
     const starrySky = document.getElementById('starry-sky');
-    const leavesContainer = document.querySelector('.layer-leaves'); // 落叶容器
+    const leavesContainer = document.querySelector('.layer-leaves');
     const wishTextEl = document.getElementById('wish-text');
     const bgm = document.getElementById('bgm');
     const musicToggle = document.getElementById('music-toggle');
@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 1500);
 
         initialize3D();
-        createLeaves(20); // 生成20片落叶
+        createLeaves(25);
         
         const fullWishText = "希望你健健康康，每天开开心心的，\n我会一直陪着你。";
         typeWriter(fullWishText, wishTextEl, 0);
@@ -44,22 +44,48 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleMove(x, y) { const { clientWidth, clientHeight } = document.documentElement; const rotY = 15 * ((x - clientWidth / 2) / (clientWidth / 2)); const rotX = -15 * ((y - clientHeight / 2) / (clientHeight / 2)); diorama.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`; }
     function handleOrientation(e) { const rotY = e.gamma * 0.5; const rotX = (e.beta - 45) * 0.5; diorama.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`; }
 
-    // --- 猫咪交互 (已修复) ---
-    [cat1, guluCat].forEach(cat => {
-        cat.addEventListener('click', (e) => {
-            e.stopPropagation();
-            // 在点击的全局位置创建爱心
-            createClickHeart(e.clientX, e.clientY);
-        });
+    // --- 核心修改：分离两只猫的点击事件 ---
+
+    // 左猫(cat1)：显示对话框 + 触发爱心
+    cat1.addEventListener('click', (event) => {
+        event.stopPropagation();
+        showCatDialogue('主人，我也想你了~'); // 调用新函数显示对话
+        createClickHeart(event.clientX, event.clientY); // 同时触发爱心
     });
+
+    // 右猫(guluCat)：仅触发爱心
+    guluCat.addEventListener('click', (event) => {
+        event.stopPropagation();
+        createClickHeart(event.clientX, event.clientY);
+    });
+
+    // --- 新增：显示猫咪对话框的函数 ---
+    function showCatDialogue(text) {
+        // 先移除可能已存在的对话框，防止重复
+        const existingDialogue = cat1.querySelector('.cat-dialogue');
+        if (existingDialogue) {
+            existingDialogue.remove();
+        }
+
+        const dialogue = document.createElement('div');
+        dialogue.className = 'cat-dialogue';
+        dialogue.textContent = text;
+        
+        cat1.appendChild(dialogue); // 将对话框添加到猫咪的HTML元素中
+
+        // 动画时长为3秒，结束后自动移除对话框
+        setTimeout(() => {
+            dialogue.remove();
+        }, 3000);
+    }
 
     // --- 爱心粒子效果 ---
     function createClickHeart(x, y) {
-        const heartColors = ['#e89f71', '#d4ac6e', '#f0c2b6'];
+        const heartColors = ['#f2a699', '#e89f71', '#d4ac6e'];
         const randomColor = heartColors[Math.floor(Math.random() * heartColors.length)];
         const heartSVG = `<svg viewBox="0 0 24 24" style="width: 100%; height: 100%; fill: ${randomColor};"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg>`;
         
-        for (let i = 0; i < 15; i++) { // 一次点击生成多个爱心
+        for (let i = 0; i < 15; i++) {
             const heart = document.createElement('div');
             heart.innerHTML = heartSVG;
             heart.style.position = 'fixed'; 
@@ -90,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
             element.innerHTML = text.substring(0, i + 1).replace(/\n/g, '<br>');
             setTimeout(() => typeWriter(text, element, i + 1), 200);
         } else {
-            element.style.borderRight = 'none'; // 移除光标
+            element.style.borderRight = 'none';
         }
     }
     
@@ -117,15 +143,15 @@ document.addEventListener('DOMContentLoaded', () => {
         starrySky.appendChild(star);
     }
 
-    // --- 新增：生成落叶 ---
+    // --- 生成落叶 ---
     function createLeaves(count) {
         if (!leavesContainer) return;
         for (let i = 0; i < count; i++) {
             const leaf = document.createElement('div');
             const style = Math.ceil(Math.random() * 3);
-            const duration = Math.random() * 5 + 8; // 8-13秒
-            const delay = Math.random() * 10; // 0-10秒延迟
-            const sway = Math.random() * 2 - 1; // -1 to 1
+            const duration = Math.random() * 8 + 10;
+            const delay = Math.random() * 15;
+            const sway = Math.random() * 2 - 1;
 
             leaf.className = `leaf style${style}`;
             leaf.style.left = `${Math.random() * 100}%`;
